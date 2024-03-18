@@ -33,8 +33,21 @@ const getAllProducts = async (
   next: NextFunction
 ) => {
   try {
-    const posts = await prisma.product.findMany();
-    res.status(200).json(posts);
+    const { _page, _limit } = req.query;
+    const page = parseInt(_page as string) || 1;
+    const limit = parseInt(_limit as string) || 10;
+
+    const offset = (page - 1) * limit;
+
+    const products = await prisma.product.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.status(200).json(products);
   } catch (error: any) {
     handleResponse(res, 500, error.message);
   }

@@ -8,14 +8,15 @@ datasource db {
 }
 
 model Product {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   name         String
   price        Float
   brand        String
   model_year   String
   quantity     Int
   color        String
-  availability Boolean @default(true)
+  availability Boolean  @default(true)
+  createdAt    DateTime @default(now())
 
   @@map(name: "products")
 }

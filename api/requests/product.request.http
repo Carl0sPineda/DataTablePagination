@@ -1,5 +1,5 @@
 ### Get all products
-GET http://localhost:8000/api/products
+GET http://localhost:8000/api/products?_page=2
 
 ### Add a product 
 ###  "availability": true or false is optional
@@ -7,12 +7,12 @@ POST http://localhost:8000/api/products
 Content-Type: application/json
 
 {
-    "name": "celular",
-    "price": 4500,
-    "brand": "iphone",
+    "name": "carro",
+    "price": 1500,
+    "brand": "audi",
     "model_year": "04/04/2020",
     "quantity": 20,
-    "color": "gray"
+    "color": "violet"
 }
 
 ### Delete product by id
