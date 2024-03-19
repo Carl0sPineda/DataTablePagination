@@ -47,7 +47,10 @@ const getAllProducts = async (
       },
     });
 
-    res.status(200).json(products);
+    const totalCount = await prisma.product.count();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    res.status(200).json({ totalPages, products });
   } catch (error: any) {
     handleResponse(res, 500, error.message);
   }
