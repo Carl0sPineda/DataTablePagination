@@ -33,21 +33,49 @@ const getAllProducts = async (
   next: NextFunction
 ) => {
   try {
-    const { _page, _limit } = req.query;
+    const { _page, _limit, _name } = req.query;
     const page = parseInt(_page as string) || 1;
     const limit = parseInt(_limit as string) || 10;
+    const name = _name as string | undefined;
 
     const offset = (page - 1) * limit;
 
-    const products = await prisma.product.findMany({
-      take: limit,
-      skip: offset,
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    let products;
+    let totalCount;
 
-    const totalCount = await prisma.product.count();
+    if (name) {
+      products = await prisma.product.findMany({
+        where: {
+          name: {
+            contains: name,
+          },
+        },
+        take: limit,
+        skip: offset,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      totalCount = await prisma.product.count({
+        where: {
+          name: {
+            contains: name,
+          },
+        },
+      });
+    } else {
+      products = await prisma.product.findMany({
+        take: limit,
+        skip: offset,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      totalCount = await prisma.product.count();
+    }
+
     const totalPages = Math.ceil(totalCount / limit);
 
     res.status(200).json({ totalPages, products });
