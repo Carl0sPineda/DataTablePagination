@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useGetAllsProducts } from "../hooks/queries/product.queries";
+import { useDebounce } from "use-debounce";
 
 const Products = () => {
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const { data: productData } = useGetAllsProducts(pageNumber);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [nameSearch, setNameSearch] = useState("");
+  const [debouncedNameSearch] = useDebounce(nameSearch, 300);
+  const { data: productData } = useGetAllsProducts(
+    pageNumber,
+    debouncedNameSearch
+  );
 
   const goToNextPage = () => {
     setPageNumber((prevPageNumber) => prevPageNumber + 1);
@@ -15,12 +21,25 @@ const Products = () => {
     }
   };
 
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNameSearch(event.target.value);
+    setPageNumber(1);
+  };
+
   return (
     <div className="mt-8 mx-4">
-      {/* <Search /> */}
       <h1 className="text-center mb-5 text-3xl">
         Tabla de productos paginación
       </h1>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={nameSearch}
+          onChange={handleSearchChange}
+          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-100"
+        />
+      </div>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         {/* Table */}
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -78,36 +97,34 @@ const Products = () => {
           </tbody>
         </table>
       </div>
-      {productData && (
-        <div className="flex justify-center mt-4">
-          {/* Pagination Buttons */}
-          <button
-            onClick={goToPreviousPage}
-            disabled={pageNumber === 1}
-            className={`${
-              pageNumber === 1
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-900"
-            } font-bold py-2 px-4 mr-2 rounded-l`}
-          >
-            Anterior
-          </button>
-          <span className="py-2 px-4 bg-gray-200">
-            {pageNumber}/{productData?.totalPages}
-          </span>
-          <button
-            onClick={goToNextPage}
-            disabled={pageNumber === productData?.totalPages}
-            className={`${
-              pageNumber === productData?.totalPages
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : "bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-900"
-            } font-bold py-2 px-4 ml-2 rounded-r`}
-          >
-            Siguiente
-          </button>
-        </div>
-      )}
+      <div className="flex justify-center mt-4">
+        {/* Pagination Buttons */}
+        <button
+          onClick={goToPreviousPage}
+          disabled={pageNumber === 1}
+          className={`${
+            pageNumber === 1
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-900"
+          } font-bold py-2 px-4 mr-2 rounded-l`}
+        >
+          Anterior
+        </button>
+        <span className="py-2 px-4 bg-gray-200">
+          {pageNumber}/{productData?.totalPages}
+        </span>
+        <button
+          onClick={goToNextPage}
+          disabled={pageNumber === productData?.totalPages}
+          className={`${
+            pageNumber === productData?.totalPages
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-900"
+          } font-bold py-2 px-4 ml-2 rounded-r`}
+        >
+          Siguiente
+        </button>
+      </div>
     </div>
   );
 };
